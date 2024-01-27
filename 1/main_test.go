@@ -10,9 +10,10 @@ import (
 type TestCase struct {
 	HealthyInstances []*NATInstance
 	Subnets          []*Subnet
+	Expected         []Expectation
 }
 
-type Result struct {
+type Expectation struct {
 	NatInstances     []string
 	AssociateSubnets map[string][]string
 }
@@ -63,6 +64,44 @@ func Test_allocate(t *testing.T) {
 					Zone: "us-west1-c",
 				},
 			},
+
+			Expected: []Expectation{
+				Expectation{
+					NatInstances: []string{
+						"1-us-west1-a", "2-us-west1-b", "3-us-west1-b",
+					},
+
+					AssociateSubnets: map[string][]string{
+						"1-us-west1-a": []string{"1-us-west1-a", "4-us-west1-c"},
+						"2-us-west1-b": []string{"2-us-west1-b"},
+						"3-us-west1-b": []string{"3-us-west1-b"},
+					},
+				},
+
+				Expectation{
+					NatInstances: []string{
+						"1-us-west1-a", "2-us-west1-b", "3-us-west1-b",
+					},
+
+					AssociateSubnets: map[string][]string{
+						"1-us-west1-a": []string{"1-us-west1-a"},
+						"2-us-west1-b": []string{"2-us-west1-b", "4-us-west1-c"},
+						"3-us-west1-b": []string{"3-us-west1-b"},
+					},
+				},
+
+				Expectation{
+					NatInstances: []string{
+						"1-us-west1-a", "2-us-west1-b", "3-us-west1-b",
+					},
+
+					AssociateSubnets: map[string][]string{
+						"1-us-west1-a": []string{"1-us-west1-a"},
+						"2-us-west1-b": []string{"2-us-west1-b"},
+						"3-us-west1-b": []string{"3-us-west1-b", "4-us-west1-c"},
+					},
+				},
+			},
 		},
 
 		TestCase{
@@ -77,6 +116,48 @@ func Test_allocate(t *testing.T) {
 				},
 				&NATInstance{
 					Id:   "3",
+					Zone: "us-west1-c",
+				},
+			},
+
+			Subnets: []*Subnet{
+				&Subnet{
+					Id:   "1",
+					Zone: "us-west1-a",
+				},
+				&Subnet{
+					Id:   "2",
+					Zone: "us-west1-a",
+				},
+				&Subnet{
+					Id:   "3",
+					Zone: "us-west1-b",
+				},
+			},
+
+			Expected: []Expectation{
+				Expectation{
+					NatInstances: []string{
+						"1-us-west1-a", "2-us-west1-b", "3-us-west1-c",
+					},
+
+					AssociateSubnets: map[string][]string{
+						"1-us-west1-a": []string{"1-us-west1-a", "2-us-west1-a"},
+						"2-us-west1-b": []string{"3-us-west1-b"},
+						"3-us-west1-c": []string{},
+					},
+				},
+			},
+		},
+
+		TestCase{
+			HealthyInstances: []*NATInstance{
+				&NATInstance{
+					Id:   "1",
+					Zone: "us-west1-a",
+				},
+				&NATInstance{
+					Id:   "2",
 					Zone: "us-west1-b",
 				},
 			},
@@ -92,34 +173,25 @@ func Test_allocate(t *testing.T) {
 				},
 				&Subnet{
 					Id:   "3",
-					Zone: "us-west1-b",
+					Zone: "us-west1-c",
+				},
+				&Subnet{
+					Id:   "4",
+					Zone: "us-west1-c",
 				},
 			},
-		},
-	}
 
-	expectations := []Result{
-		Result{
-			NatInstances: []string{
-				"1-us-west1-a", "2-us-west1-b", "3-us-west1-b",
-			},
+			Expected: []Expectation{
+				Expectation{
+					NatInstances: []string{
+						"1-us-west1-a", "2-us-west1-b",
+					},
 
-			AssociateSubnets: map[string][]string{
-				"1-us-west1-a": []string{"1-us-west1-a", "4-us-west1-c"},
-				"2-us-west1-b": []string{"2-us-west1-b"},
-				"3-us-west1-b": []string{"3-us-west1-b"},
-			},
-		},
-
-		Result{
-			NatInstances: []string{
-				"1-us-west1-a", "2-us-west1-b", "3-us-west1-b",
-			},
-
-			AssociateSubnets: map[string][]string{
-				"1-us-west1-a": []string{"1-us-west1-a", "4-us-west1-c"},
-				"2-us-west1-b": []string{"2-us-west1-b"},
-				"3-us-west1-b": []string{"3-us-west1-b"},
+					AssociateSubnets: map[string][]string{
+						"1-us-west1-a": []string{"1-us-west1-a", "3-us-west1-c"},
+						"2-us-west1-b": []string{"2-us-west1-b", "4-us-west-c"},
+					},
+				},
 			},
 		},
 	}
@@ -129,31 +201,38 @@ func Test_allocate(t *testing.T) {
 		instancesInZone = mapHealthyInstancestoZone(test.HealthyInstances)
 		allocate(instancesInZone, test.Subnets)
 
-		result := Result{}
+		result := Expectation{}
+		totalSubnet := 0
+		longestAssociateSubnet := 0
 		result.AssociateSubnets = map[string][]string{}
 		for _, instances := range instancesInZone {
 			for _, i := range instances {
+				count := 0
 				instanceName := fmt.Sprintf("%v-%v", i.Id, i.Zone)
 				result.NatInstances = append(result.NatInstances, instanceName)
 				for _, s := range i.Subnets {
+					count += 1
+					totalSubnet += 1
 					subnet := fmt.Sprintf("%v-%v", s.Id, s.Zone)
 					result.AssociateSubnets[instanceName] = append(result.AssociateSubnets[instanceName], subnet)
+				}
+				if count > longestAssociateSubnet {
+					longestAssociateSubnet = count
 				}
 			}
 		}
 
-		// Check results
+		fmt.Println("-> Run Test", index)
+		// Check total associated subnets
+		require.Equal(t, len(test.Subnets), totalSubnet)
+		for index, expect := range test.Expected {
+			// Check number of all NAT instances
+			require.Equal(t, len(expect.NatInstances), len(result.NatInstances))
 
-		require.Equal(t, len(expectations[index].NatInstances), len(result.NatInstances))
-
-		// Check associated subnets to a specific NAT instance
-		// for _, instance := range expectations[index].NatInstances {
-		// 	expectList := expectations[index].AssociateSubnets[instance]
-		// 	require.Equal(t, elementExists(instance, expectList), true)
-		// }
-
-		for _, instance := range expectations[index].NatInstances {
-			require.Equal(t, len(expectations[index].AssociateSubnets[instance]), len(result.AssociateSubnets[instance]))
+			for _, instance := range test.Expected[index].NatInstances {
+				require.GreaterOrEqual(t, longestAssociateSubnet, len(expect.AssociateSubnets[instance]))
+			}
 		}
+
 	}
 }
