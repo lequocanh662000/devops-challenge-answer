@@ -1,7 +1,10 @@
-Please solve three challenges presented below
+# Devops Technical Assignment Answer
+Author: `lequocanh662000@gmail.com`
+`Question 1` answer :point_right: `q1/` folder
+`Question 2` answer :point_right: `q2/` folder
+`Question 3` answer :point_right: `q3/` folder
 
-Don't hesitate to ask for clarifications if required (nam@skymavis.com)
-
+## Questions:
 1. You have 3 Availability Zones (AZs) with n Private Subnets, and m NAT Instances per AZ. Private Subnets need to route traffic through NAT Instances which block any traffic not going to a whitelisted domain. 
    For HA we have to dynamically allocate private subnets to NAT Instances. First of all, we need to allocate subnets to NAT Instances within the same AZ. If there are no healthy NAT Instances in the same AZ, only then will we allocate subnets to any NAT Instance in any other AZ.
 
