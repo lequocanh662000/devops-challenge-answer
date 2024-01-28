@@ -1,8 +1,9 @@
 # Devops Technical Assignment Answer
 Author: `lequocanh662000@gmail.com`
-`Question 1` answer :point_right: `q1/` folder
-`Question 2` answer :point_right: `q2/` folder
-`Question 3` answer :point_right: `q3/` folder
+
+- `Question 1` answer :point_right: `q1/` folder
+- `Question 2` answer :point_right: `q2/` folder
+- `Question 3` answer :point_right: `q3/` folder
 
 ## Questions:
 1. You have 3 Availability Zones (AZs) with n Private Subnets, and m NAT Instances per AZ. Private Subnets need to route traffic through NAT Instances which block any traffic not going to a whitelisted domain. 
