@@ -1,5 +1,5 @@
 locals {  
-  team_members = flatten([
+  loaded_team_members = flatten([
     for team in yamldecode(file("variables.yaml")).teams : [
       for tn, t in github_team.all : {
         name    = t.name
@@ -12,7 +12,7 @@ locals {
   ])
 
 
-  members = flatten([ for team in local.team_members : [
+  member_users = flatten([ for team in local.loaded_team_members : [
       for name in team.members : {
         identifier = "${team.slug}-${name}"
         team_id = team.id
@@ -22,7 +22,7 @@ locals {
     ]
   ])
 
-  maintainers = flatten([ for team in local.team_members : [
+  maintainer_users = flatten([ for team in local.loaded_team_members : [
       for name in team.maintainers : {
         identifier = "${team.slug}-${name}"
         team_id = team.id
@@ -32,5 +32,5 @@ locals {
     ]
   ])
 
-  all_users = concat(local.members, local.maintainers)
+  all_users = concat(local.member_users, local.maintainer_users)
 }
