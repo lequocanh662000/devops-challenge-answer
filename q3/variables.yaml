@@ -96,7 +96,7 @@ teams:
     maintainer:
       - User1
 
-  - name: Team5
+  - name: Team6
     description: "DES 6"
     privacy: closed
     member:
