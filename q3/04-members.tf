@@ -1,7 +1,7 @@
 resource "github_membership" "all" {
   for_each = {
-    for member in yamldecode(file("variables.yaml")).members:
-    member.username => member
+    for user in yamldecode(file("variables.yaml")).users:
+    user.username => user
   }
 
   username = each.value.username

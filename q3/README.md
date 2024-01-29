@@ -12,7 +12,7 @@ export GITHUB_OWNER=<sensitive>
 
 ### Apply configuration
 Apply this terraform manifest with following orders:
-1. Define member in the organization
+1. Define member in the GitHub organization
 ```
 terraform apply -target github_team.all
 ```
