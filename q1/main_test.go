@@ -28,8 +28,9 @@ func elementExists(element string, list []string) bool {
 	return false
 }
 
-func Test_allocate(t *testing.T) {
-	testcases := []TestCase{
+var (
+	testcases []TestCase = []TestCase{
+		// Test 1
 		TestCase{
 			HealthyInstances: []*NATInstance{
 				&NATInstance{
@@ -104,6 +105,7 @@ func Test_allocate(t *testing.T) {
 			},
 		},
 
+		// Test 2
 		TestCase{
 			HealthyInstances: []*NATInstance{
 				&NATInstance{
@@ -150,6 +152,7 @@ func Test_allocate(t *testing.T) {
 			},
 		},
 
+		// Test 3
 		TestCase{
 			HealthyInstances: []*NATInstance{
 				&NATInstance{
@@ -194,8 +197,47 @@ func Test_allocate(t *testing.T) {
 				},
 			},
 		},
-	}
 
+		// Test 4
+		TestCase{
+			HealthyInstances: []*NATInstance{
+				&NATInstance{
+					Id:   "1",
+					Zone: "us-west1-a",
+				},
+			},
+
+			Subnets: []*Subnet{
+				&Subnet{
+					Id:   "1",
+					Zone: "us-west1-a",
+				},
+				&Subnet{
+					Id:   "2",
+					Zone: "us-west1-b",
+				},
+				&Subnet{
+					Id:   "3",
+					Zone: "us-west1-c",
+				},
+			},
+
+			Expected: []Expectation{
+				Expectation{
+					NatInstances: []string{
+						"1-us-west1-a",
+					},
+
+					AssociateSubnets: map[string][]string{
+						"1-us-west1-a": []string{"1-us-west1-a", "2-us-west1-b", "3-us-west1-c"},
+					},
+				},
+			},
+		},
+	}
+)
+
+func Test_allocate(t *testing.T) {
 	for index, test := range testcases {
 		instancesInZone := make(map[string][]*NATInstance)
 		instancesInZone = mapHealthyInstancestoZone(test.HealthyInstances)
@@ -223,6 +265,8 @@ func Test_allocate(t *testing.T) {
 		}
 
 		fmt.Println("-> Run Test", index)
+		printInstances(instancesInZone)
+
 		// Check total associated subnets
 		require.Equal(t, len(test.Subnets), totalSubnet)
 		for index, expect := range test.Expected {

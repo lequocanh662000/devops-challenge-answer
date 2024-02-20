@@ -60,7 +60,7 @@ type NATInstance struct {
 func printInstances(instancesInZone map[string][]*NATInstance) {
 	for _, instances := range instancesInZone {
 		for _, i := range instances {
-			fmt.Printf("Instance (%v-%v):\n", i.Id, i.Zone)
+			fmt.Printf("  Instance (%v-%v):\n", i.Id, i.Zone)
 			for _, s := range i.Subnets {
 				fmt.Printf("\tsubnet (%v-%v)\n", s.Id, s.Zone)
 			}
@@ -78,7 +78,7 @@ func mapHealthyInstancestoZone(healthyInstances []*NATInstance) map[string][]*NA
 	return instancesInZone
 }
 
-// allocate Subnets to Instances
+// Allocate Subnets to Instances
 func allocate(instancesInZone map[string][]*NATInstance, subnets []*Subnet) {
 	for _, s := range subnets {
 		natInstances := instancesInZone[s.Zone]
@@ -120,4 +120,9 @@ func allocate(instancesInZone map[string][]*NATInstance, subnets []*Subnet) {
 		}
 	}
 
+}
+
+// Allocate Subnets to Instances (in case each Subnet has a Weight int32)
+func allocateV2() {
+	return
 }
