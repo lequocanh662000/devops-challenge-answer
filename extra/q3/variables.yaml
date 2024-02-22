@@ -1,0 +1,59 @@
+# Define member in the organization
+users:
+  - username: User1
+    role: member
+  - username: User2
+    role: member
+  - username: User3
+    role: member
+  - username: User4
+    role: member
+  - username: User5
+    role: member
+
+teams:
+  - name: Team1
+    description: "Description Team 1"
+    privacy: closed
+    member:
+      - User1
+      - User3
+      - User5
+    maintainer:
+      - User2
+
+  - name: Team2
+    description: "Description Team 2"
+    privacy: closed
+    member:
+      - User2
+      - User3
+      - User4
+    maintainer:
+      - User1
+
+repositories:
+  # - name: yasuo
+  #   teams:
+  #     - name: Team1
+  #       permission: maintain
+  #     - name: Team2
+  #       permission: push
+  
+  # - name: yone
+  #   teams:
+  #     - name: Team1
+  #       permission: maintain
+  #     - name: Team2
+  #       permission: pull
+  
+  yasuo:
+    - name: Team1
+      permission: maintain
+    - name: Team2
+      permission: push
+  yone: 
+    - name: Team1
+      permission: maintain
+    - name: Team2
+      permission: pull

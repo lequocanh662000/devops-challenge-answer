@@ -1,3 +1,5 @@
+# Q3 version 2 solution
+
 # Wiki
 The `local.team_members` value depends on the `github_team.all` resource, so you must create your teams before you can add members to them.
 
@@ -12,9 +14,8 @@ To avoid surpassing the organization's invitation rate limit, I've deactivated c
 export GITHUB_TOKEN=<sensitive>
 export GITHUB_OWNER=<sensitive>
 ```
--> Notes: The `repo` permisison for full control of private repositories; The `admin:org` permission for full control of orgs and teams, read and write org projects The `delete_repo` permission to delete repositories
 
-2. Define teams & members & repos in `variables.yaml`
+2. Define teams & members in `variables.yaml`
 
 ### Apply configuration
 Apply this terraform manifest with following orders:
@@ -23,7 +24,7 @@ Apply this terraform manifest with following orders:
 terraform apply -target github_team.all
 ```
 
-2. Assign members into teams and teams into repos
+2. Assign members into teams
 ```
 terraform apply
 ```

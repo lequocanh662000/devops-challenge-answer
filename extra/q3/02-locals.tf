@@ -35,4 +35,26 @@ locals {
   ])
 
   all_users = concat(local.member_users, local.maintainer_users)
+
+  // Load repositories and associate teams in variables.yaml
+  // yasuo repo
+  yasuo_teams = flatten([
+    for  team in yamldecode(file("variables.yaml")).repositories.yasuo : [
+        for tn, t in github_team.all : {
+          identifier="yasuo-${tn}-${team.permission}"
+          team_id = t.id
+          permission = team.permission
+        } if t.name == team.name
+    ]
+  ])
+  // yone repo
+  yone_teams = flatten([
+    for  team in yamldecode(file("variables.yaml")).repositories.yone : [
+        for tn, t in github_team.all : {
+          identifier="yone-${tn}-${team.permission}"
+          team_id = t.id
+          permission = team.permission
+        } if t.name == team.name
+    ]
+  ])
 }
